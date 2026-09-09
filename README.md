@@ -62,6 +62,25 @@ to tmux's internal buffer.
 
 Requires tmux 3.0+ for `tmux-256color` and the `if-shell` clipboard detection.
 
+## Requirements
+
+`install.sh` checks all of this and tells you what's missing. The one that is
+**not optional**:
+
+- **`tree-sitter` CLI >= 0.26.1.** nvim-treesitter is pinned to its `main`
+  branch, which shells out to `tree-sitter generate` / `tree-sitter build` for
+  every parser. Without it, parser installs fail with
+  `Error during "tree-sitter build": ENOENT ... 'tree-sitter'` and
+  `:checkhealth` reports `tree-sitter-cli not found`.
+  `brew install tree-sitter`, or `cargo install tree-sitter-cli`.
+- A C compiler (`cc`) — parsers compile from C.
+- `git`, `make`.
+
+Quiet ones — everything loads fine, features just don't work: `rg`
+(`<leader>fg`), `fd`, `node` (TypeScript server), `curl`/`unzip` (Mason),
+`lazygit`, a clipboard provider, and `rust-analyzer`/`rustfmt` from rustup
+(`rust_analyzer` is enabled unconditionally but never attaches without it).
+
 ## Notes / known rough edges
 
 - **Theme sync.** nvim's colorscheme is remembered in
