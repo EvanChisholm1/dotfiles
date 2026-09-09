@@ -10,14 +10,37 @@ cd ~/dotfiles
 ./install.sh
 ```
 
-`install.sh` symlinks configs into `$HOME`, backing up anything already there
-to `<file>.bak`. Edits made afterwards go straight into the repo.
+`install.sh` symlinks configs into place, backing up anything already there to
+`<name>.bak`. Because they're symlinks, edits you make afterwards land in the
+repo — `git diff` in `~/dotfiles` shows what you've changed. It also reports any
+missing dependency whose absence fails *quietly* (ripgrep, a clipboard
+provider) rather than loudly.
 
 ## What's here
 
-| Path             | Links to       | Notes                                |
-| ---------------- | -------------- | ------------------------------------ |
-| `tmux/tmux.conf` | `~/.tmux.conf` | Prefix `C-a`, vim keys, no plugins   |
+| Path             | Links to        | Notes                                     |
+| ---------------- | --------------- | ----------------------------------------- |
+| `tmux/tmux.conf` | `~/.tmux.conf`  | Prefix `C-a`, vim keys, no plugins        |
+| `nvim/`          | `~/.config/nvim`| lazy.nvim, LSP for TS/JS + Rust + Python  |
+
+Each has its own README: [`nvim/README.md`](nvim/README.md) is the full
+keymap reference and VSCode translation table.
+
+## First run on a new machine
+
+1. `./install.sh`
+2. Launch `nvim` — lazy.nvim bootstraps itself, then installs the 36 plugins
+   pinned in `nvim/lazy-lock.json`. Treesitter parsers compile on first use.
+3. Language servers install via Mason on first file open. `:Mason` to watch,
+   `:checkhealth` when it settles.
+4. `tmux` picks up its config on next launch.
+
+Expect a couple of minutes of downloading on step 2–3. Everything after that
+is local.
+
+`lazy-lock.json` is committed deliberately: a fresh clone installs the exact
+plugin commits running on the machine this was captured from, not whatever is
+on `main` today. After a deliberate `:Lazy update`, commit the changed lockfile.
 
 ## tmux cheatsheet
 
@@ -38,3 +61,17 @@ Copy mode yanks to the system clipboard using whichever of `pbcopy`,
 to tmux's internal buffer.
 
 Requires tmux 3.0+ for `tmux-256color` and the `if-shell` clipboard detection.
+
+## Notes / known rough edges
+
+- **Theme sync.** nvim's colorscheme is remembered in
+  `~/.local/share/nvim/colorscheme` (not in this repo — it's per-machine), and
+  Ghostty's lives in `~/.config/ghostty/config.ghostty`. They're meant to
+  match; nothing enforces it. `<Space>uc` in nvim to change.
+- **`gr` / `gi`.** These are bound to LSP references/implementations, and are
+  also prefixes of Neovim 0.11+'s built-in `grn`/`gra`/`grr`/`gri`/`grt`/`grx`.
+  A complete mapping that's also a prefix makes Vim wait `timeoutlen` (400ms)
+  before firing. If `gr` feels sluggish, deleting those six defaults in
+  `nvim/lua/plugins/lsp.lua` clears the ambiguity.
+- **Go** isn't set up. `brew install go`, then uncomment `"gopls"` in
+  `nvim/lua/plugins/lsp.lua`.

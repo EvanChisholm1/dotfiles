@@ -1,0 +1,12 @@
+# Backups install.sh leaves behind
+*.bak
+
+# nvim: plugin code, language servers and state all live under
+# ~/.local/share/nvim and ~/.local/state/nvim, not here. lazy-lock.json IS
+# tracked on purpose -- it's what makes a fresh clone reproduce this setup.
+nvim/spell/
+nvim/.netrwhist
+nvim/session/
+
+# macOS
+.DS_Store
