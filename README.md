@@ -76,10 +76,24 @@ Requires tmux 3.0+ for `tmux-256color` and the `if-shell` clipboard detection.
 - A C compiler (`cc`) — parsers compile from C.
 - `git`, `make`.
 
-Quiet ones — everything loads fine, features just don't work: `rg`
-(`<leader>fg`), `fd`, `node` (TypeScript server), `curl`/`unzip` (Mason),
-`lazygit`, a clipboard provider, and `rust-analyzer`/`rustfmt` from rustup
-(`rust_analyzer` is enabled unconditionally but never attaches without it).
+**`node` + `npm`** are optional only in the sense that nvim starts without
+them. Mason installs 6 of the 8 language servers through npm — `ts_ls`,
+`pyright`, and `eslint`/`jsonls`/`html`/`cssls` (those four are one npm
+package, `vscode-langservers-extracted`, so they fail as a group). Only
+`lua_ls` and `ruff` come from GitHub releases. Without node you get a pile of
+Mason install failures naming servers rather than the missing runtime.
+
+nvm installs node via your shell rc, so nvim launched outside a login shell
+can miss it even when your terminal has it. Check from inside nvim:
+
+```vim
+:lua print(vim.fn.exepath("npm"))
+```
+
+Other quiet ones — everything loads, features just don't work: `rg`
+(`<leader>fg`), `fd`, `curl`/`unzip` (Mason), `lazygit`, a clipboard provider,
+and `rust-analyzer`/`rustfmt` from rustup (`rust_analyzer` is enabled
+unconditionally but never attaches without it).
 
 ## Notes / known rough edges
 

@@ -51,9 +51,21 @@ have make || hard+=("make -- builds telescope-fzf-native")
 have curl  || soft+=("curl -- Mason downloads language servers with it")
 have unzip || soft+=("unzip -- Mason unpacks some servers with it")
 
+# node/npm gate most of the language servers. Mason shells out to `npm` for
+# ts_ls, pyright, and eslint/jsonls/html/cssls -- those last four are all one
+# npm package (vscode-langservers-extracted), so they fail as a group. Only
+# lua_ls and ruff come from GitHub releases and survive without node.
+# Note nvm installs node into your shell rc, so a GUI-launched nvim can have
+# node on PATH in a terminal and not see it at all. Check inside nvim with
+#   :lua print(vim.fn.exepath("npm"))
+if ! have node || ! have npm; then
+  soft+=("node + npm -- REQUIRED for 6 of the 8 language servers:")
+  soft+=("    ts_ls, pyright, eslint, jsonls, html, cssls")
+  soft+=("    (only lua_ls and ruff work without it)")
+fi
+
 have rg   || soft+=("ripgrep (rg) -- <leader>fg live_grep silently finds nothing")
 have fd   || soft+=("fd -- telescope file finding falls back to a slower walk")
-have node || soft+=("node -- the TypeScript language server runs on it")
 have lazygit || soft+=("lazygit -- <leader>gg")
 
 # rust-analyzer is enabled unconditionally but comes from rustup, not Mason,
@@ -87,7 +99,13 @@ fi
 if [ ${#soft[@]} -gt 0 ]; then
   echo
   echo "Missing (optional -- these fail quietly rather than loudly):"
-  for m in "${soft[@]}"; do echo "  - $m"; done
+  # entries starting with spaces are continuation lines, not new bullets
+  for m in "${soft[@]}"; do
+    case "$m" in
+      "  "*) echo "  $m" ;;
+      *)     echo "  - $m" ;;
+    esac
+  done
 fi
 
 echo
