@@ -140,22 +140,34 @@ return {
       })
 
       -- ── install + enable ───────────────────────────────────────────────
-      require("mason-lspconfig").setup({
-        ensure_installed = {
-          "lua_ls",     -- Lua (this config)
-          "ts_ls",      -- TypeScript / JavaScript
-          "eslint",     -- JS/TS linting
-          "jsonls",     -- JSON + schema validation
-          "html",
-          "cssls",
-          "pyright",    -- Python types
-          "ruff",       -- Python lint/format
-          -- "gopls",   -- uncomment after `brew install go`
-        },
-        -- stylua/prettierd ship an --lsp mode that mason would happily
-        -- enable as a second client; conform already drives them
-        automatic_enable = { exclude = { "stylua", "prettierd" } },
-      })
+      -- ensure_installed resolves each name against mason's registry index
+      -- synchronously and never fetches it first. On a fresh machine that
+      -- index hasn't been downloaded yet, so every lookup misses and you get
+      --   Server "eslint" is not a valid entry in ensure_installed.
+      --   Make sure to only provide lspconfig server names.
+      -- which blames the names. They're fine; the registry just isn't there
+      -- yet. Refresh first. On a warm cache mason invokes the callback
+      -- immediately (registry/init.lua), so this costs nothing after run one.
+      require("mason-registry").refresh(function()
+        vim.schedule(function()
+          require("mason-lspconfig").setup({
+            ensure_installed = {
+              "lua_ls",     -- Lua (this config)
+              "ts_ls",      -- TypeScript / JavaScript
+              "eslint",     -- JS/TS linting
+              "jsonls",     -- JSON + schema validation
+              "html",
+              "cssls",
+              "pyright",    -- Python types
+              "ruff",       -- Python lint/format
+              -- "gopls",   -- uncomment after `brew install go`
+            },
+            -- stylua/prettierd ship an --lsp mode that mason would happily
+            -- enable as a second client; conform already drives them
+            automatic_enable = { exclude = { "stylua", "prettierd" } },
+          })
+        end)
+      end)
 
       -- rust-analyzer comes from your rustup toolchain, not Mason
       vim.lsp.enable("rust_analyzer")
