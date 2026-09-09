@@ -24,8 +24,16 @@ return {
       local actions = require("telescope.actions")
       return {
         defaults = {
+          -- selection_caret and entry_prefix MUST have the same display width,
+          -- and neither may be a byte-prefix of the other. Picker:update_prefix
+          -- identifies the caret to replace by testing selection_caret first
+          -- (pickers.lua), so a 1-space caret matches an unselected row's
+          -- 2-space prefix, replaces only its first byte, and leaves the row one
+          -- space wider every time the selection moves off it -- the whole list
+          -- creeps right as you scroll.
           prompt_prefix = "  ",
-          selection_caret = " ",
+          selection_caret = "❯ ",
+          entry_prefix = "  ",
           path_display = { "truncate" },
           sorting_strategy = "ascending",
           layout_config = { horizontal = { prompt_position = "top", preview_width = 0.55 } },
