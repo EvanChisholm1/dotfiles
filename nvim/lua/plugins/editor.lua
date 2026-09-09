@@ -2,7 +2,15 @@ return {
   -- ── fuzzy finding: the cmd+P / cmd+shift+F replacement ────────────────
   {
     "nvim-telescope/telescope.nvim",
-    branch = "0.1.x",
+    -- master, not 0.1.x. 0.1.x was last touched May 2024 and still calls
+    -- nvim-treesitter's master-branch module API -- parsers.ft_to_lang() and
+    -- configs.is_enabled(). This config pins nvim-treesitter to `main`, where
+    -- `parsers` is a plain data table and `configs` no longer exists at all, so
+    -- previewing a file and <leader>/ both died with
+    --   attempt to call field 'ft_to_lang' (a nil value)
+    -- Upstream fixed it in #3566 (treesitter: standalone implementation);
+    -- master needs nvim >= 0.11 and touches no nvim-treesitter Lua API.
+    branch = "master",
     cmd = "Telescope",
     dependencies = {
       "nvim-lua/plenary.nvim",
